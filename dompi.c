@@ -1,21 +1,30 @@
 #include <mpi.h>
 #include <assert.h>
+#include <string.h>
 
 #include "dompi.h"
 #include "mandelbrot.h"
-//#include "mandelcuda.h"
+#include "mandelcuda.h"
 #include "mandelimagem.h"
 
 // Mandelbrot iterations
 #define M 100
 
+// CUDA threads per block (Dota)
+#define CUDA_THREADS 256
+
 // This is the function to be executed by all worker_threads. It receives a task
 // and a pointer where to put the partial result (the part of the image being processed).
 REAL *thread_work(int start, int end, struct parameters params) {
-
-    return mandelbrot(start, end, M, 
-                      params.c0x, params.c0y, params.c1x, params.c1y, params.width, params.height);
-
+    if (strcmp(params.processor, "cpu") == 0)
+        return mandelbrot(start, end, M, 
+                          params.c0x, params.c0y, params.c1x, params.c1y, 
+                          params.width, params.height);
+    else
+        return mandelbrot_cuda(start, end, M, 
+                          params.c0x, params.c0y, params.c1x, params.c1y, 
+                          params.width, params.height,
+                          CUDA_THREADS);
 }
 
 
