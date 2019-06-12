@@ -15,17 +15,10 @@
     exit(EXIT_FAILURE); \
 }
 
-
 // These tags are used to identify the messages. TCP does not guarantee that
 // two sent messages sent will be received in the correct order.
-#define TAG_TASK    0
-#define TAG_RESULT  1
-
-// Task distribution 
-// TODO remove it! Try not to use Gather, only Scatter
-struct task {
-    int start, end;
-};
+//#define TAG_TASK    0
+//#define TAG_RESULT  1
 
 // Command-line parameters
 struct parameters {
