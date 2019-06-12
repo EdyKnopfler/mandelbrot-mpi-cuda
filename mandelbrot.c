@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <complex.h>
 
-REAL *mandelbrot_omp(int start, int end, int M, REAL c0x, REAL c0y, REAL c1x, REAL c1y, int largura, int altura) {
+REAL *mandelbrot(int start, int end, int M, REAL c0x, REAL c0y, REAL c1x, REAL c1y, int largura, int altura) {
     REAL dx, dy, x, y;
     REAL complex z, c;
     int indice, lin, col, iter, N = largura * altura;
