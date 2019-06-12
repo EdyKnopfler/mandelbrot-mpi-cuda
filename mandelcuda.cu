@@ -11,11 +11,10 @@ void cudaAssert(cudaError_t erro) {
     }
 }
 
-__global__ void gpu_mandelbrot(REAL *imagem, int start, REAL c0x, REAL c0y, REAL c1x, REAL c1y, 
+__global__ void gpu_mandelbrot(REAL *imagem, int n, int start, REAL c0x, REAL c0y, REAL c1x, REAL c1y, 
                                int largura, int altura, int M) {
     REAL dx, dy, x, y;
     thrust::complex<REAL> z, c;
-    int n = largura * altura;
     int indice = blockDim.x * blockIdx.x + threadIdx.x;
     int lin, col, iter;
     
@@ -49,7 +48,7 @@ REAL *mandelbrot_cuda(int start, int end, int M,
     imagem = (REAL *) malloc(n*sizeof(REAL));
     cudaAssert(cudaSetDevice(0));
     cudaAssert(cudaMalloc(&d_imagem, n*sizeof(REAL)));
-    gpu_mandelbrot<<<blocos, threads_por_bloco>>>(d_imagem, start, c0x, c0y, c1x, c1y, largura, altura, M);
+    gpu_mandelbrot<<<blocos, threads_por_bloco>>>(d_imagem, n, start, c0x, c0y, c1x, c1y, largura, altura, M);
     cudaAssert(cudaPeekAtLastError());
     cudaAssert(cudaDeviceSynchronize());
     cudaAssert(cudaMemcpy(imagem, d_imagem, n*sizeof(REAL), cudaMemcpyDeviceToHost));
