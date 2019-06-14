@@ -23,7 +23,7 @@
 // Command-line parameters
 struct parameters {
     REAL c0x, c0y, c1x, c1y;
-    int width, height;
+    int width, height, threads;
     char *processor, *output;
 };
 

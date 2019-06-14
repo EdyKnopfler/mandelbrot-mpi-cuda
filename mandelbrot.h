@@ -2,6 +2,8 @@
 
 #define _MANDELBROT
 
-REAL *mandelbrot(int start, int end, int M, REAL c0x, REAL c0y, REAL c1x, REAL c1y, int largura, int altura);
+#include "dompi.h"
+
+REAL *mandelbrot(int start, int end, int M, struct params params);
 
 #endif

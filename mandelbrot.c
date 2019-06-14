@@ -1,25 +1,27 @@
 #include "mandelbrot.h"
-#include "mandelimagem.h"
 
-#include <stdio.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <complex.h>
 
-REAL *mandelbrot(int start, int end, int M, REAL c0x, REAL c0y, REAL c1x, REAL c1y, int largura, int altura) {
+REAL *mandelbrot(int start, int end, int M, struct parameters params) {
     REAL dx, dy, x, y;
     REAL complex z, c;
-    int indice, lin, col, iter, N = largura * altura;
+    int idx, lin, col, iter, N = params.width * params.height;
     REAL *imagem;
 
     imagem = malloc((end - start) * sizeof(REAL));
-    dx = (c1x - c0x) / largura;
-    dy = (c1y - c0y) / altura;
+    dx = (params.c1x - params.c0x) / params.width;
+    dy = (params.c1y - params.c0y) / params.height;
     
-    for (indice = start; indice < end; indice++) {
-        if (indice >= N) break;  // Lidando com a sobra
+    omp_set_num_threads(params.threads);
+    
+    #pragma omp parallel for
+    for (idx = start; idx < end; idx++) {
+        if (idx >= N) break;  // Lidando com a sobra
         
-        lin = indice / largura;
-        col = indice % largura;
+        lin = idx / largura;
+        col = idx % largura;
         
         z = 0.0 + 0.0 * I;
         x = c0x + col*dx;
@@ -31,7 +33,7 @@ REAL *mandelbrot(int start, int end, int M, REAL c0x, REAL c0y, REAL c1x, REAL c
             if (cabsf(z) > 2.0) break;
         }
         
-        imagem[indice - start] = 255.0 - iter * 255.0 / M;
+        imagem[idx - start] = 255.0 - iter * 255.0 / M;
     }
     
     return imagem;

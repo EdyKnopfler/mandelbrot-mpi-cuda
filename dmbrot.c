@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
         DIE("There was an MPI initialization error.\n");
 
     // Argument parsing
-    if (argc < 9) {
-        printf("usage: %s <C0_REAL> <C0_IMAG> <C1_REAL> <C1_IMAG> <W> <H> <CPU/GPU> <OUTPUT>\n",
+    if (argc < 10) {
+        printf("usage: %s <C0_REAL> <C0_IMAG> <C1_REAL> <C1_IMAG> <W> <H> <CPU/GPU> <THREADS> <OUTPUT>\n",
                argv[0]);
         return 1;
     }
@@ -35,7 +35,8 @@ int main(int argc, char **argv) {
     params.width = atoi(argv[5]);
     params.height = atoi(argv[6]);
     params.processor = argv[7];
-    params.output = argv[8];
+    params.threads = atoi(argv[8]);
+    params.output = argv[9];
 
     do_mpi(params, world_size, taskid);
 

@@ -11,19 +11,18 @@ void cudaAssert(cudaError_t erro) {
     }
 }
 
-__global__ void gpu_mandelbrot(REAL *imagem, int n, int start, REAL c0x, REAL c0y, REAL c1x, REAL c1y, 
-                               int largura, int altura, int M) {
+__global__ void gpu_mandelbrot(REAL *imagem, int n, int start, int M, struct parameters params) {
     REAL dx, dy, x, y;
     thrust::complex<REAL> z, c;
-    int indice = blockDim.x * blockIdx.x + threadIdx.x;
+    int idx = blockDim.x * blockIdx.x + threadIdx.x;
     int lin, col, iter;
     
-    if (indice >= n) return;
+    if (idx >= n) return;
     
-    lin = (indice + start) / largura;
-    col = (indice + start) % largura;
-    dx = (c1x - c0x) / largura;
-    dy = (c1y - c0y) / altura;
+    lin = (idx + start) / params.width;
+    col = (idx + start) % params.width;
+    dx = (c1x - c0x) / params.width;
+    dy = (c1y - c0y) / params.height;
     
     z = thrust::complex<REAL>((REAL) 0.0, (REAL) 0.0);
     x = c0x + col*dx;
@@ -35,20 +34,17 @@ __global__ void gpu_mandelbrot(REAL *imagem, int n, int start, REAL c0x, REAL c0
         if (thrust::abs(z) > (REAL) 2.0) break;
     }
     
-    imagem[indice] = 255.0 - iter * 255.0 / M;
+    imagem[idx] = 255.0 - iter * 255.0 / M;
 }
 
-REAL *mandelbrot_cuda(int start, int end, int M, 
-                      REAL c0x, REAL c0y, REAL c1x, REAL c1y, 
-                      int largura, int altura,
-                      int threads_por_bloco) {
+REAL *mandelbrot_cuda(int start, int end, int M, struct parameters params) {
     int n = end - start;
-    int blocos = (n + threads_por_bloco - 1) / threads_por_bloco;
+    int blocos = (n + params.threads - 1) / params.threads;
     REAL *imagem, *d_imagem;
     imagem = (REAL *) malloc(n*sizeof(REAL));
     cudaAssert(cudaSetDevice(0));
     cudaAssert(cudaMalloc(&d_imagem, n*sizeof(REAL)));
-    gpu_mandelbrot<<<blocos, threads_por_bloco>>>(d_imagem, n, start, c0x, c0y, c1x, c1y, largura, altura, M);
+    gpu_mandelbrot<<<blocos, params.threads>>>(d_imagem, n, start, M, params);
     cudaAssert(cudaPeekAtLastError());
     cudaAssert(cudaDeviceSynchronize());
     cudaAssert(cudaMemcpy(imagem, d_imagem, n*sizeof(REAL), cudaMemcpyDeviceToHost));
