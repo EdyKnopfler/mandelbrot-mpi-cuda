@@ -18,22 +18,22 @@ REAL *mandelbrot(int start, int end, int M, struct parameters params) {
     
     #pragma omp parallel for
     for (idx = start; idx < end; idx++) {
-        if (idx >= N) break;  // Lidando com a sobra
-        
-        lin = idx / largura;
-        col = idx % largura;
-        
-        z = 0.0 + 0.0 * I;
-        x = c0x + col*dx;
-        y = c0y + lin*dy;
-        c = x + y * I;
-        
-        for (iter = 0; iter < M; iter++) {
-            z = cpowf(z, 2.0) + c;
-            if (cabsf(z) > 2.0) break;
+        if (idx < N) {
+            lin = idx / params.width;
+            col = idx % params.width;
+            
+            z = 0.0 + 0.0 * I;
+            x = params.c0x + col*dx;
+            y = params.c0y + lin*dy;
+            c = x + y * I;
+            
+            for (iter = 0; iter < M; iter++) {
+                z = cpowf(z, 2.0) + c;
+                if (cabsf(z) > 2.0) break;
+            }
+            
+            imagem[idx - start] = 255.0 - iter * 255.0 / M;
         }
-        
-        imagem[idx - start] = 255.0 - iter * 255.0 / M;
     }
     
     return imagem;

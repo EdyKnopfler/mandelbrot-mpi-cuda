@@ -21,12 +21,12 @@ __global__ void gpu_mandelbrot(REAL *imagem, int n, int start, int M, struct par
     
     lin = (idx + start) / params.width;
     col = (idx + start) % params.width;
-    dx = (c1x - c0x) / params.width;
-    dy = (c1y - c0y) / params.height;
+    dx = (params.c1x - params.c0x) / params.width;
+    dy = (params.c1y - params.c0y) / params.height;
     
     z = thrust::complex<REAL>((REAL) 0.0, (REAL) 0.0);
-    x = c0x + col*dx;
-    y = c0y + lin*dy;
+    x = params.c0x + col*dx;
+    y = params.c0y + lin*dy;
     c = thrust::complex<REAL>(x, y);
     
     for (iter = 0; iter < M; iter++) {
